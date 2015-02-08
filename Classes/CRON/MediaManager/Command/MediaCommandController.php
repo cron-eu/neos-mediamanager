@@ -104,15 +104,10 @@ class MediaCommandController extends \TYPO3\Flow\Cli\CommandController {
 	 * @return void
 	 */
 	public function listCommand() {
-		$this->outputLine();
-		$this->outputLine('%d record(s) found.', array($this->imageRepository->countAll()));
-		$this->outputLine();
 		foreach ($this->imageRepository->findAll() as $image) {
-
-			$this->outputLine('%s: "%s" (%s)',array(
-				$image->getIdentifier(),
-				$image->getLabel(),
+			$this->outputLine("%s\t%s",array(
 				$image->getResource(),
+				$image->getLabel(),
 			));
 		}
 	}
