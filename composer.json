@@ -1,0 +1,13 @@
+{
+    "name": "cron/mediamanager",
+    "type": "typo3-flow-package",
+    "description": "List, purge and garbage collect media (image) resources",
+    "require": {
+        "typo3/flow": "*"
+    },
+    "autoload": {
+        "psr-0": {
+            "CRON\\MediaManager": "Classes"
+        }
+    }
+}
