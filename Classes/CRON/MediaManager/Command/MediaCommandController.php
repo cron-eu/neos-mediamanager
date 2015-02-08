@@ -44,11 +44,9 @@ class MediaCommandController extends \TYPO3\Flow\Cli\CommandController {
 	 * @return int number of resources deleted
 	 */
 	private function removeAllImages($exclusionList = NULL) {
-		$hash = $exclusionList ? array_flip($exclusionList) : array();
 		$count = 0;
 		foreach ($this->imageRepository->findAll() as $image) {
-			$resource = (string)$image->getResource();
-			if (!isset($hash[$resource])) {
+			if (!isset($exclusionList[$image->getIdentifier()])) {
 				$this->persistenceManager->remove($image);
 				$count++;
 			}
@@ -84,7 +82,7 @@ class MediaCommandController extends \TYPO3\Flow\Cli\CommandController {
 			foreach($node->getProperties() as $property => $object) {
 				if ($object instanceof ImageVariant) {
 					if ($originalImage = $object->getOriginalImage())
-						$usedResources[] = (string)$originalImage->getResource();
+						$usedResources[$originalImage->getIdentifier()] = (string)$originalImage->getResource();
 				}
 			}
 		}
@@ -105,7 +103,8 @@ class MediaCommandController extends \TYPO3\Flow\Cli\CommandController {
 	 */
 	public function listCommand() {
 		foreach ($this->imageRepository->findAll() as $image) {
-			$this->outputLine("%s\t%s",array(
+			$this->outputLine("%s\t%s\t%s",array(
+				$image->getIdentifier(),
 				$image->getResource(),
 				$image->getLabel(),
 			));
