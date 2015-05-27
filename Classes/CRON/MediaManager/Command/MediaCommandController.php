@@ -8,7 +8,6 @@ namespace CRON\MediaManager\Command;
 
 use TYPO3\Media\Domain\Repository\ImageRepository;
 use TYPO3\Flow\Persistence\PersistenceManagerInterface;
-use TYPO3\Flow\Resource\Resource as FlowResource;
 use TYPO3\Media\Domain\Model\ImageVariant;
 
 use TYPO3\Flow\Annotations as Flow;
@@ -81,8 +80,8 @@ class MediaCommandController extends \TYPO3\Flow\Cli\CommandController {
 		foreach ($this->nodeDataRepository->findAll() as $node) {
 			foreach($node->getProperties() as $property => $object) {
 				if ($object instanceof ImageVariant) {
-					if ($originalImage = $object->getOriginalImage())
-						$usedResources[$originalImage->getIdentifier()] = (string)$originalImage->getResource();
+					if ($originalAsset = $object->getOriginalAsset())
+						$usedResources[$originalAsset->getIdentifier()] = (string)$originalAsset->getResource();
 				}
 			}
 		}
