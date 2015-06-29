@@ -8,11 +8,13 @@ namespace CRON\MediaManager\Command;
 
 use TYPO3\Media\Domain\Model\Image;
 use TYPO3\Media\Domain\Model\ImageInterface;
+use TYPO3\Media\Domain\Model\Tag;
+use TYPO3\Media\Domain\Repository\AssetRepository;
 use TYPO3\Media\Domain\Repository\ImageRepository;
 use TYPO3\Flow\Persistence\PersistenceManagerInterface;
 use TYPO3\Media\Domain\Model\ImageVariant;
-
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Media\Domain\Repository\TagRepository;
 
 /**
  * @Flow\Scope("singleton")
@@ -24,6 +26,18 @@ class MediaCommandController extends \TYPO3\Flow\Cli\CommandController {
 	 * @var ImageRepository
 	 */
 	protected $imageRepository;
+
+	/**
+	 * @Flow\Inject
+	 * @var TagRepository
+	 */
+	protected $tagRepository;
+
+	/**
+	 * @Flow\Inject
+	 * @var AssetRepository
+	 */
+	protected $assetRepository;
 
 	/**
 	 * @Flow\Inject
@@ -93,6 +107,20 @@ class MediaCommandController extends \TYPO3\Flow\Cli\CommandController {
 			$this->imageRepository->countAll(),
 			$removedCount,
 		));
+	}
+
+	/**
+	 * Delete all unused Tags
+	 *
+	 */
+	public function cleanupTagsCommand() {
+		/** @var Tag $tag */
+		foreach ($this->tagRepository->findAll() as $tag) {
+			if ($this->assetRepository->countByTag($tag) == 0) {
+				$this->outputLine('Tag "%s" deleted.', [$tag->getLabel()]);
+				$this->tagRepository->remove($tag);
+			}
+		}
 	}
 
 	/**
