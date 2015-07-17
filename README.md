@@ -35,7 +35,8 @@ accordingly in your `composer.json`:
 Then you can just install the package using composer:
 
 ```
-composer require cron/neos-mediamanager:dev-master
+composer require --no-update cron/neos-mediamanager:dev-master
+composer install --no-dev
 ```
 
 ### Usage
