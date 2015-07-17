@@ -2,12 +2,10 @@
     "name": "cron/neos-mediamanager",
     "type": "typo3-flow-package",
     "description": "List, purge and garbage collect media (image) resources",
-    "require": {
-        "typo3/flow": "3.0.*@beta",
-        "typo3/media": "2.0.x-dev",
-        "typo3/typo3cr": "2.0.x-dev"
-    },
-    "autoload": {
+	"require": {
+		"typo3/neos": "~2.0"
+	},
+	"autoload": {
         "psr-0": {
             "CRON\\MediaManager": "Classes"
         }
