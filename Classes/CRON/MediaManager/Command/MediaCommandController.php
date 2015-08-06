@@ -56,13 +56,14 @@ class MediaCommandController extends \TYPO3\Flow\Cli\CommandController {
 	 * listet in the $excludeList
 	 *
 	 * @param array $exclusionList
+	 * @param bool $dryRun
 	 * @return int number of resources deleted
 	 */
-	private function removeAllImages($exclusionList = NULL) {
+	private function removeAllImages($exclusionList = NULL, $dryRun=false) {
 		$count = 0;
 		foreach ($this->imageRepository->findAll() as $image) {
 			if (!isset($exclusionList[$image->getIdentifier()])) {
-				$this->persistenceManager->remove($image);
+				if (!$dryRun) $this->persistenceManager->remove($image);
 				$count++;
 			}
 		}
@@ -89,21 +90,23 @@ class MediaCommandController extends \TYPO3\Flow\Cli\CommandController {
 	 * Remove all image resources which are not linked to any node in any
 	 * workspace.
 	 *
+	 * @param bool $dryRun
+	 *
 	 * @return void
 	 */
-	public function gcCommand() {
-		$usedResources = [];
+	public function gcCommand($dryRun=false) {
+		$usedImagesAndVariants = [];
 
 		foreach ($this->nodeDataRepository->findAll() as $node) {
 			foreach ($node->getProperties() as $property => $object) {
 				if ($object instanceof ImageVariant) {
-					if ($originalAsset = $object->getOriginalAsset())
-						$usedResources[$originalAsset->getIdentifier()] = (string)$originalAsset->getResource();
-				}
+					$object = $object->getOriginalAsset();
+				} elseif (!$object instanceof Image) continue; // we handle only Image and ImageVariant 's
+				if ($object) $usedImagesAndVariants[$object->getIdentifier()] = (string)$object->getResource();
 			}
 		}
 
-		$removedCount = $this->removeAllImages($usedResources);
+		$removedCount = $this->removeAllImages($usedImagesAndVariants, $dryRun);
 		$this->outputLine('%d resource(s) total, %d resource(s) removed.', [
 			$this->imageRepository->countAll(),
 			$removedCount,
