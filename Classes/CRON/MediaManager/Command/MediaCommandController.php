@@ -66,6 +66,7 @@ class MediaCommandController extends \TYPO3\Flow\Cli\CommandController {
 				$count++;
 			}
 		}
+
 		return $count;
 	}
 
@@ -79,7 +80,7 @@ class MediaCommandController extends \TYPO3\Flow\Cli\CommandController {
 	 */
 	public function pruneCommand() {
 		$count = $this->removeAllImages();
-		$this->outputLine('%d record(s) purged.', array($count));
+		$this->outputLine('%d record(s) purged.', [$count]);
 	}
 
 	/**
@@ -91,10 +92,10 @@ class MediaCommandController extends \TYPO3\Flow\Cli\CommandController {
 	 * @return void
 	 */
 	public function gcCommand() {
-		$usedResources = array();
+		$usedResources = [];
 
 		foreach ($this->nodeDataRepository->findAll() as $node) {
-			foreach($node->getProperties() as $property => $object) {
+			foreach ($node->getProperties() as $property => $object) {
 				if ($object instanceof ImageVariant) {
 					if ($originalAsset = $object->getOriginalAsset())
 						$usedResources[$originalAsset->getIdentifier()] = (string)$originalAsset->getResource();
@@ -103,10 +104,10 @@ class MediaCommandController extends \TYPO3\Flow\Cli\CommandController {
 		}
 
 		$removedCount = $this->removeAllImages($usedResources);
-		$this->outputLine('%d resource(s) total, %d resource(s) removed.', array(
+		$this->outputLine('%d resource(s) total, %d resource(s) removed.', [
 			$this->imageRepository->countAll(),
 			$removedCount,
-		));
+		]);
 	}
 
 	/**
@@ -132,11 +133,13 @@ class MediaCommandController extends \TYPO3\Flow\Cli\CommandController {
 		$size = 0;
 		/** @var ImageInterface $variant */
 		foreach ($variants as $variant) $size += $variant->getResource()->getFileSize();
+
 		return [count($variants), $size];
 	}
 
 	/**
 	 * Print some infos abotu an image variant
+	 *
 	 * @param Image $imageVariant
 	 */
 	private function printImageVariant($imageVariant) {
@@ -145,22 +148,24 @@ class MediaCommandController extends \TYPO3\Flow\Cli\CommandController {
 			$imageVariant->getWidth(),
 			$imageVariant->getHeight(),
 			$imageVariant->getAspectRatio(),
-		    $imageVariant->getResource()->getFileSize()/1024
+			$imageVariant->getResource()->getFileSize() / 1024
 		]);
 	}
 
 	/**
 	 * Print out some infos about an image asset
+	 *
 	 * @param ImageInterface $image
 	 */
 	private function printImageInfo($image) {
 		$this->outputLine('Filename: %s', [$image->getResource()->getFilename()]);
-		$this->outputLine('Filesize (original): %.1f kb', [$image->getResource()->getFileSize()/1024]);
+		$this->outputLine('Filesize (original): %.1f kb', [$image->getResource()->getFileSize() / 1024]);
 		$this->outputLine('Image size: %dx%d', [$image->getWidth(), $image->getHeight()]);
 	}
 
 	/**
 	 * Print out some data about the image asset and its variants
+	 *
 	 * @param string $identifier
 	 */
 	public function showCommand($identifier) {
@@ -195,22 +200,22 @@ class MediaCommandController extends \TYPO3\Flow\Cli\CommandController {
 			$totalCount++;
 			list($variantsCount, $variantsSize) = $this->getVariantsCount($image);
 			$totalSizeOfImageVariants += $variantsSize;
-			$this->outputLine("%s\t%s (%dx%d) [%d variant(s)]",array(
+			$this->outputLine("%s\t%s (%dx%d) [%d variant(s)]", [
 				$image->getIdentifier(),
 				$image->getLabel(),
 				$image->getWidth(),
 				$image->getHeight(),
 				$variantsCount
-			));
+			]);
 			$totalSize += $image->getResource()->getFileSize();
 			$totalVariantsCount += $variantsCount;
 		}
 		$this->outputLine('# %d assets (%d variants) Total size in MB: %.1f (Original Images: %.1f, Variants: %.1f)', [
 			$totalCount,
 			$totalVariantsCount,
-			($totalSize+$totalSizeOfImageVariants)/1024/1024,
-			$totalSize/1024/1024,
-			$totalSizeOfImageVariants/1024/1024
+			($totalSize + $totalSizeOfImageVariants) / 1024 / 1024,
+			$totalSize / 1024 / 1024,
+			$totalSizeOfImageVariants / 1024 / 1024
 		]);
 	}
 }
