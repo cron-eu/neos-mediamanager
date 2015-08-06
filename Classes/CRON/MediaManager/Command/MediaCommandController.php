@@ -6,6 +6,8 @@ namespace CRON\MediaManager\Command;
  *                                                                        *
  *                                                                        */
 
+use CRON\CRLib\Utility\NodeQuery;
+use Doctrine\ORM\Query;
 use TYPO3\Media\Domain\Model\Image;
 use TYPO3\Media\Domain\Model\ImageInterface;
 use TYPO3\Media\Domain\Model\Tag;
@@ -44,12 +46,6 @@ class MediaCommandController extends \TYPO3\Flow\Cli\CommandController {
 	 * @var PersistenceManagerInterface
 	 */
 	protected $persistenceManager;
-
-	/**
-	 * @Flow\Inject
-	 * @var \TYPO3\TYPO3CR\Domain\Repository\NodeDataRepository
-	 */
-	protected $nodeDataRepository;
 
 	/**
 	 * Remove all image resources from the repository which are not
@@ -97,12 +93,14 @@ class MediaCommandController extends \TYPO3\Flow\Cli\CommandController {
 	public function gcCommand($dryRun=false) {
 		$usedImagesAndVariants = [];
 
-		foreach ($this->nodeDataRepository->findAll() as $node) {
-			foreach ($node->getProperties() as $property => $object) {
+		$nodeQuery = new NodeQuery();
+		foreach ($nodeQuery->getQuery()->iterate(null, Query::HYDRATE_SCALAR) as $row) {
+			$nodeData = $row[0];
+			foreach ($nodeData['n_properties'] as $property => $object) {
 				if ($object instanceof ImageVariant) {
 					$object = $object->getOriginalAsset();
 				} elseif (!$object instanceof Image) continue; // we handle only Image and ImageVariant 's
-				if ($object) $usedImagesAndVariants[$object->getIdentifier()] = (string)$object->getResource();
+				if ($object) $usedImagesAndVariants[$object->getIdentifier()] = true;
 			}
 		}
 

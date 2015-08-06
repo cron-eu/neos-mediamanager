@@ -2,8 +2,12 @@
     "name": "cron/neos-mediamanager",
     "type": "typo3-flow-package",
     "description": "List, purge and garbage collect media (image) resources",
+	"repositories": [
+		{ "type": "git", "url": "git@github.com:cron-eu/neos-crlib.git" }
+	],
 	"require": {
-		"typo3/neos": "~2.0"
+		"typo3/neos": "~2.0",
+		"cron/neos-crlib": "dev-master"
 	},
 	"autoload": {
         "psr-0": {
