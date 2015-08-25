@@ -7,7 +7,7 @@
 	],
 	"require": {
 		"typo3/neos": "~2.0",
-		"cron/neos-crlib": "2.0"
+		"cron/neos-crlib": "2.0.x-dev"
 	},
 	"autoload": {
         "psr-0": {
